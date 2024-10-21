@@ -1,30 +1,39 @@
-class Solution(object):
-    def numIslands(self, grid):
-        """
-        :type grid: List[List[str]]
-        :rtype: int
-        """
-        rows, cols = len(grid), len(grid[0])
-        visited = [[False] * cols for _ in range (rows)]
-        direction = [[0, 1], [1, 0], [0, -1], [-1, 0]] #left, down, right, up
+from collections import deque
+R, C = map(int, input().strip().split())
+matrix = []
+for _ in range(R):
+    line = list(map(int, input().strip().split()))
+    matrix.append(line)
+visited = [[False]*C for _ in range(R)]
+directions = [[1,0], [0,1], [-1,0], [0,-1]]
+cnt = 0
 
-        count = 0
+def dfs(r, c):
+    visited[r][c] = True
+    for d in directions:
+        nx = r + d[0]
+        ny = c + d[1]
+        if 0 <= nx < R and 0 <= ny < C and matrix[nx][ny] == 1 and not visited[nx][ny]:
+            dfs(nx, ny)
 
-        def inArea(row, col):
-            return (0<= row < rows) and (0<= col < cols)
+def bfs(q):
+    while q:
+        cur = q.popleft()
+        x, y = cur
+        if visited[x][y]:  # 防止重复访问
+            continue
+        visited[x][y] = True
+        for d in directions:
+            nx = x + d[0]
+            ny = y + d[1]
+            if 0 <= nx < R and 0 <= ny < C and matrix[nx][ny] == 1 and not visited[nx][ny]:
+                q.append((nx, ny))
 
-        def dfs(row, col):
-            visited[row][col] = True
-            for d in direction:
-                next_row = row + d[0]
-                next_col = col + d[1]
-                if inArea(next_row, next_col):
-                    if grid[next_row][next_col] == '1' and (not visited[next_row][next_col]):
-                        dfs(next_row, next_col)
+for i in range(R):
+    for j in range(C):
+        if matrix[i][j] == 1 and not visited[i][j]:
+            q = deque([(i, j)])
+            bfs(q)
+            cnt += 1
 
-        for row in range(rows):
-            for col in range(cols):
-                if grid[row][col] == '1' and (not visited[row][col]):
-                    dfs(row, col)
-                    count += 1
-        return count
+print(cnt)
